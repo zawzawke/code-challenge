@@ -39,3 +39,11 @@ def test_complex_queries():
 
 if __name__ == "__main__":
     test_complex_queries()
+
+from lib.models.author import Author
+
+Author.add_author_with_articles("Zuri Tech", [
+    {"title": "AI vs Humanity", "magazine_id": 1},
+    {"title": "Smart Cities", "magazine_id": 2}
+])
+
