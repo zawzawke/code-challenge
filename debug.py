@@ -1,54 +1,41 @@
+from lib.db.connection import get_connection
 from lib.models.author import Author
 from lib.models.magazine import Magazine
-from lib.db.connection import get_connection
 
-def main():
-    # Connect to DB
-    conn = get_connection()
-    
-    # Test Author methods
-    print("Testing Author methods...")
-    author = Author.find_by_id(1)
-    if author:
-        print(f"Author found: {author.name}")
-        print("Articles by author:")
-        for article in author.articles():
-            print(article)
-        print("Magazines author contributed to:")
-        for mag in author.magazines():
-            print(mag)
-        print("Topic areas author contributed to:")
-        for category in author.topic_areas():
-            print(category)
+def test_complex_queries():
+    print("Testing complex SQL query methods...\n")
 
-        # Test add_article
-        magazine = Magazine.find_by_id(1)
-        if magazine:
-            author.add_article(magazine, "New Article Title from debug.py")
-            print("Added new article for author.")
-
+    # 1. Authors who have written for a specific magazine
+    mag = Magazine.find_by_name("Tech Today")
+    if mag:
+        print(f"Authors who wrote for magazine '{mag.name}':")
+        authors = mag.authors()
+        for author in authors:
+            print(f"- {author[1]}")
     else:
-        print("Author with ID 1 not found.")
+        print("Magazine 'Tech Today' not found.")
+    print()
 
-    # Test Magazine methods
-    print("\nTesting Magazine methods...")
-    magazine = Magazine.find_by_id(1)
-    if magazine:
-        print(f"Magazine found: {magazine.name}")
-        print("Articles in magazine:")
-        for article in magazine.articles():
-            print(article)
-        print("Contributors to magazine:")
-        for contributor in magazine.contributors():
-            print(contributor)
-        print("Article titles in magazine:")
-        for title in magazine.article_titles():
-            print(title)
-        print("Contributing authors with > 2 articles:")
-        for author in magazine.contributing_authors():
-            print(author)
+    # 2. Magazines with articles by at least 2 different authors
+    print("Magazines with articles by 2 or more authors:")
+    magazines = Magazine.magazines_with_multiple_authors(2)
+    for magazine in magazines:
+        print(f"- {magazine[1]} (Category: {magazine[2]})")
+    print()
+
+    # 3. Number of articles per magazine
+    print("Number of articles per magazine:")
+    counts = Magazine.article_counts()
+    for name, count in counts:
+        print(f"- {name}: {count} articles")
+    print()
+
+    # 4. Author who has written the most articles
+    top_author = Author.top_author()
+    if top_author:
+        print(f"Author with the most articles: {top_author[1]} ({top_author[2]} articles)")
     else:
-        print("Magazine with ID 1 not found.")
+        print("No authors found.")
 
 if __name__ == "__main__":
-    main()
+    test_complex_queries()
